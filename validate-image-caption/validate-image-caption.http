@@ -1,0 +1,6 @@
+@validate_image_caption_HostAddress = http://localhost:5062
+
+GET {{validate_image_caption_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,5 +1,6 @@
 ﻿using Azure;
-using ImageCaptionServices;
+using DescrptionEnhancementService;
+using ImageCaptionService.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -13,11 +14,15 @@ namespace ValidateImageCaptionAPI.Controllers
         private readonly ILogger<ValidateController> _logger;
         private readonly IConfiguration _configuration;
         private readonly IImageCaptionOrchestrator _imageCaptionService;
+        private readonly IDescriptionOrchestrator _descriptionOrchestrator;
 
-        public ValidateController(IConfiguration configuration, IImageCaptionOrchestrator imageCaptionService)
+        public ValidateController(IConfiguration configuration, 
+                                  IImageCaptionOrchestrator imageCaptionService,
+                                  IDescriptionOrchestrator descriptionOrchestrator)
         {
             _configuration = configuration;
             _imageCaptionService = imageCaptionService;
+            _descriptionOrchestrator = descriptionOrchestrator;
         }
 
         // GET: api/<ValuesController>
@@ -28,17 +33,24 @@ namespace ValidateImageCaptionAPI.Controllers
 
             response = await _imageCaptionService.OrchestrateAsync(imageName);
           
-            if (response == null)
-              return BadRequest($"Null Completion returned to endpoint");
+            if (string.IsNullOrEmpty(response))
+              return BadRequest($"Image Not Found");
         
             return Ok(response);
         }
 
         // GET: api/<ValuesController>
         [HttpGet("enhance-description")]
-        public async Task<IActionResult> EnhanceDescription()
+        public async Task<IActionResult> EnhanceDescription(string productDescription)
         {
-            return Ok() ;
+            string response = null;
+
+            response = await _descriptionOrchestrator.OrchestrateAsync(productDescription);
+
+            if (string.IsNullOrEmpty(response))
+                return BadRequest($"Product Not Found");
+
+            return Ok(response);
         }
 
 

@@ -1,4 +1,4 @@
-﻿namespace ImageCaptionServices
+﻿namespace ImageCaptionService.Contracts
 {
     public interface IImageCaptionOrchestrator
     {

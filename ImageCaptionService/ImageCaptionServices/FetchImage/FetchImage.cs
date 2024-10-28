@@ -1,9 +1,9 @@
 ﻿using Azure.Storage.Blobs;
-using ImageCaptionService;
+using ImageCaptionService.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace ImageCaptionServices
+namespace ImageCaptionService.ImageCaptionServices.FetchImage
 {
     internal class FetchImage : IFetchImage
     {
@@ -20,12 +20,12 @@ namespace ImageCaptionServices
             _configuration = configuration;
         }
 
-        public async Task<string> FetchImageAsync(string imageName)
+        public async Task<byte[]> FetchImageAsync(string imageName)
         {
             try
             {
                 //// Get the container name from the configuration
-                var containerName = _configuration["blobstorage_containername"] ?? throw new ArgumentException("blobstorage_containername is missing");
+                //var containerName = _configuration["blobstorage_containername"] ?? throw new ArgumentException("blobstorage_containername is missing");
 
                 // Create a BlobContainerClient
                 var blobContainerClient = new BlobContainerClient(_blobClient.Uri, new BlobClientOptions());
@@ -51,10 +51,12 @@ namespace ImageCaptionServices
                     imageBytes = ms.ToArray();
                 }
 
-                // Step 2: Convert image to Base64
-                string imageBase64 = Convert.ToBase64String(imageBytes);
+                return imageBytes;
 
-                return imageBase64;
+                //// Step 2: Convert image to Base64
+                //string imageBase64 = Convert.ToBase64String(imageBytes);
+
+                //return imageBase64;
 
                 // At this point, you have the image in the memoryStream
                 // You can now send the image to LLM for inference or Azure Computer Vision API

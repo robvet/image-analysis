@@ -1,24 +1,25 @@
-﻿using Azure.Storage.Blobs;
-using ImageCaptionServices;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using ImageCaptionService;
+using ImageCaptionService.Contracts;
 
-namespace ImageCaptionServices
+namespace ImageCaptionService.ImageCaptionServices.Orchestrator
 {
     public class ImageCaptionOrchestrator : IImageCaptionOrchestrator
     {
         private readonly ILogger<ImageCaptionOrchestrator> _logger;
         private readonly IConfiguration _configuration;
         private readonly IFetchImage _fetchImage;
+        private readonly IInferCaption _inferCaption;
 
-        public ImageCaptionOrchestrator(ILogger<ImageCaptionOrchestrator> logger, 
+        public ImageCaptionOrchestrator(ILogger<ImageCaptionOrchestrator> logger,
                                         IConfiguration configuration,
-                                        IFetchImage fetchImage)
+                                        IFetchImage fetchImage,
+                                        IInferCaption inferCaption)
         {
             _logger = logger;
             _configuration = configuration;
             _fetchImage = fetchImage;
+            _inferCaption = inferCaption;
         }
 
         public async Task<string> OrchestrateAsync(string imageName)
@@ -26,21 +27,31 @@ namespace ImageCaptionServices
             try
             {
                 // Fetch the image
-                var imageBase64 = await _fetchImage.FetchImageAsync(imageName);
+                var imageBytes = await _fetchImage.FetchImageAsync(imageName);
+
+                if (imageBytes == null)
+                {
+                    return string.Empty;
+                }
+
+                var imageCaption = await _inferCaption.InferImageCaptionAsync(imageBytes);
+
+                if (string.IsNullOrEmpty(imageCaption))
+                {
+                    return string.Empty;
+                }
 
                 // Call the image caption service
                 //var imageCaption = await _imageCaptionService.CaptionImageAsync(imageBase64);
 
                 // Return the caption
-                //return imageCaption;
+                return imageCaption;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in ImageCaptionOrchestrator");
                 throw;
             }
-
-            return "Image Caption";
         }
     }
 }

@@ -1,7 +1,9 @@
-using System.Runtime.CompilerServices;
 using Azure.Storage.Blobs;
-using ImageCaptionService;
-using ImageCaptionServices;
+using DescrptionEnhancementService;
+using ImageCaptionService.Contracts;
+using ImageCaptionService.ImageCaptionServices.FetchImage;
+using ImageCaptionService.ImageCaptionServices.InferCaption;
+using ImageCaptionService.ImageCaptionServices.Orchestrator;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +26,11 @@ builder.Services.AddSingleton(blobClient);
 //builder.Services.AddSingleton(blobContainerName);
 builder.Services.AddScoped<IImageCaptionOrchestrator, ImageCaptionOrchestrator>();
 builder.Services.AddScoped<IFetchImage, FetchImage>();
+builder.Services.AddScoped<IInferCaption, InferCaptionRestKey>();
+//builder.Services.AddScoped<IInferCaption, InferCaptionRest>();
 
+builder.Services.AddScoped<IDescriptionOrchestrator, DescriptionOrchestrator>();
+builder.Services.AddScoped<IProductDescriptionProcessor, ProductDescriptionProcessor>();
 
 var app = builder.Build();
 

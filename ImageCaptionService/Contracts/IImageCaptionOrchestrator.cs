@@ -1,7 +1,10 @@
-﻿namespace ImageCaptionService.Contracts
+﻿using ValidateImageCaptionAPI.Models;
+
+namespace ImageCaptionService.Contracts
 {
     public interface IImageCaptionOrchestrator
     {
-        Task<string> OrchestrateAsync(string imageUrl);
+        Task<ImageCaptionResult> OrchestrateAsync(string imageName);
+        //Task<string> OrchestrateAsync(string imageUrl);
     }
 }

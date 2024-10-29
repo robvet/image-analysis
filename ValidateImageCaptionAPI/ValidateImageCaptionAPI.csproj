@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DescrptionEnhancementService\DescrptionEnhancementService.csproj" />
     <ProjectReference Include="..\ImageCaptionService\ImageCaptionService.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,10 @@
-﻿namespace ImageCaptionService.Contracts
+﻿using ValidateImageCaptionAPI.Models;
+
+namespace ImageCaptionService.Contracts
 {
     public interface IInferCaption
     {
-        //Task<string> InferImageCaptionAsync(string imageBase64);
-        Task<string> InferImageCaptionAsync(byte[] imageBytes);
+        Task<ImageCaptionResult> InferImageCaptionAsync(byte[] imageBytes);
+        //Task<ImageCaptionResult> InferImageCaptionAsync(byte[] imageBytes);
     }
 }

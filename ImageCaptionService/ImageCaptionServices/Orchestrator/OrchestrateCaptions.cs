@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using ImageCaptionService.Contracts;
+using ValidateImageCaptionAPI.Models;
 
 namespace ImageCaptionService.ImageCaptionServices.Orchestrator
 {
@@ -22,7 +23,7 @@ namespace ImageCaptionService.ImageCaptionServices.Orchestrator
             _inferCaption = inferCaption;
         }
 
-        public async Task<string> OrchestrateAsync(string imageName)
+        public async Task<ImageCaptionResult> OrchestrateAsync(string imageName)
         {
             try
             {
@@ -31,20 +32,16 @@ namespace ImageCaptionService.ImageCaptionServices.Orchestrator
 
                 if (imageBytes == null)
                 {
-                    return string.Empty;
+                    return new ImageCaptionResult("Not Found", 0);
                 }
 
                 var imageCaption = await _inferCaption.InferImageCaptionAsync(imageBytes);
 
-                if (string.IsNullOrEmpty(imageCaption))
+                if (imageCaption == null)
                 {
-                    return string.Empty;
+                    return new ImageCaptionResult("Not Found", 0);
                 }
 
-                // Call the image caption service
-                //var imageCaption = await _imageCaptionService.CaptionImageAsync(imageBase64);
-
-                // Return the caption
                 return imageCaption;
             }
             catch (Exception ex)

@@ -1,7 +1,9 @@
 ﻿using Azure;
-using DescrptionEnhancementService;
+using DescrptionEnhancementService.DescrptionEnhancementServices.Contracts;
 using ImageCaptionService.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using ValidateImageCaptionAPI.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,23 +31,21 @@ namespace ValidateImageCaptionAPI.Controllers
         [HttpGet("caption-image")]
         public async Task<IActionResult> CaptionImage(string imageName)
         {
-            string response = null;
-
-            response = await _imageCaptionService.OrchestrateAsync(imageName);
+            var response = await _imageCaptionService.OrchestrateAsync(imageName);
           
-            if (string.IsNullOrEmpty(response))
-              return BadRequest($"Image Not Found");
-        
-            return Ok(response);
+            if (response == null)
+                return BadRequest($"Image Not Found");
+
+            string json = JsonConvert.SerializeObject(response, Formatting.Indented);
+
+            return Ok(json);
         }
 
         // GET: api/<ValuesController>
         [HttpGet("enhance-description")]
         public async Task<IActionResult> EnhanceDescription(string productDescription)
         {
-            string response = null;
-
-            response = await _descriptionOrchestrator.OrchestrateAsync(productDescription);
+            var response = await _descriptionOrchestrator.OrchestrateAsync(productDescription);
 
             if (string.IsNullOrEmpty(response))
                 return BadRequest($"Product Not Found");

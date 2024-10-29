@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 using System.Runtime.ConstrainedExecution;
 
-namespace ImageCaptionService
+namespace DescrptionEnhancementService.DescrptionEnhancementServices.Prompts
 {
     internal static class PromptTemplates
     {
@@ -18,50 +18,49 @@ namespace ImageCaptionService
         // Prompt Reinforcement: Emphasize the JSON format and fields (object and probability) to guide the model to follow the structure exactly.
         // Temperature and Top-p: Set temperature to a low value(e.g., 0.1) and top-p between 0.1 and 0.3 to minimize creative variance,
         // which is important when you need consistent JSON outputs and a straightforward probability estimate.
-
-        // System Prompt
-        //public const string SystemPromptTemplate = """
-        //    You are an image recognition assistant. Your task is to examine images provided by the user and respond with only the label naming the main object in the picture. Avoid adding any descriptive details, explanations, or additional context. Respond with only a single word or phrase if possible.
-        //    """;
-
-        //public const string SystemPromptTemplate = """
-        //    You are an image recognition assistant. Your task is to examine images provided by the user and respond with only the label naming the main object in the picture. Additionally, include an estimated probability score for the inference. Return your response as a JSON object with fields object for the label and probability for the probability estimate. Avoid adding any descriptive details, explanations, or additional context. Respond concisely.
-        //    """;
-
         public const string SystemPromptTemplate = """
-            You are an image recognition assistant. Your task is to examine images provided by the user and respond with a JSON object. The JSON object should contain two fields: object, which is the main object label you infer, and probability, which is your estimated confidence in that inference as a decimal between 0.0 and 1.0. Always provide both fields, and do not leave any fields blank. Avoid any additional context or description outside of the JSON format.
-            """;
+            You are an AI assistant specializing in transforming brief, technical vendor product descriptions into engaging, customer-friendly descriptions. Your task is to ensure that each product description is easy to understand, detailed, and appealing to potential customers. Follow these guidelines:
+            1. Expand Abbreviations and Jargon: Spell out abbreviations and simplify technical terms, using common language whenever possible.
+            2. Add Relevant Context: If details are implied or vague, make educated guesses to ensure the description is informative (e.g., adding the purpose or benefit of a feature if obvious).
+            3. Highlight Key Features and Benefits: Describe the main features and benefits of the product in a way that resonates with the customer, explaining why they might want it.
+            4. Use Friendly, Conversational Language: Keep the tone approachable and helpful, as though speaking to a customer in a store.
 
+            Respond only with the enhanced product description, without repeating the original input.
+
+            """;
 
         /// <summary>
         /// Prompt template for for extracting keyword search from user question to be used 
         /// against the search engine to build retriever.
         /// </summary>
-        //public const string MainPromptTemplate = """
-        //    Please identify the main object in the provided image. Respond only with concise, short term describing the object.
-        //    """
-        //;
-
-        //public const string MainPromptTemplate = """
-        //    Please identify the main object in the provided image and include a probability estimate for your inference. Return only the JSON response, with fields object for the label and probability for your confidence estimate (a decimal between 0.0 and 1.0)
-        //    """;
-
         public const string MainPromptTemplate = """
-            Please identify the main object in the provided image and include a probability estimate in JSON format, even if you’re uncertain. If uncertain, set probability to 0.5.
+            Transform the following cryptic product description from a vendor into a detailed, customer-friendly description.
             
-            Return the analysis as an object named CaptionsCompletion in JSON format. Do not include the word JSON. 
-            Ensure the CaptionsCompletion object includes the object and probability percentage.
+            Follow these guidelines:
             
-            The JSON representation should be in the following format:
+            1. Expand abbreviations and technical terms.
+            2. Clarify any details that might be unclear, ensuring the description is easy to understand.
+            3. Use simple, friendly language that highlights product features or benefits.
 
-            { "object": "banana", "probability": 0.9 }
-            
-            Return only the CaptionsCompletion in a valid JSON format - nothing else.
+            Examples:
 
-            Replace values as appropriate and ensure both fields are always populated.
-            
-            DO NOT PUT ANY CHARACTERS OR STRINGS WHATSOEVER of ANY KIND BEFORE OR AFTER THE CaptionsCompletion object. This includes  ``` , ```, {, or } -- ABSOLUTELY NO CHARACTERS.
-            As well, DO NOT include the word JSON anywhere in the response.
+            Vendor Description: ""USB-C chgr, PD 30W, incl 3ft cable, compact.""
+            Enhanced Description: ""Compact USB-C charger with 30W Power Delivery for fast and efficient charging. Includes a 3-foot cable, making it ideal for charging devices on the go.""
+
+            Vendor Description: ""AAA batt, 1200 mAh, long-life, 1.5V.""
+            Enhanced Description: ""Long-lasting AAA battery with a 1200mAh capacity, delivering 1.5 volts of power—perfect for powering remote controls, toys, and other small devices.""
+
+            Vendor Description: ""LED bulb, 800 lm, dimmable, 10W, soft white.""
+            Enhanced Description: ""Energy-efficient LED bulb with 800 lumens of brightness. Dimmable with 10 watts of power, providing a soft white light that's perfect for cozy, ambient lighting.""
+
+            Vendor Description: ""SS water btl, dbl wall, BPA-free, 20oz, leak-proof lid.""
+            Enhanced Description: ""Durable stainless steel water bottle with double-wall insulation to keep drinks hot or cold. BPA-free, with a 20 oz capacity and a leak-proof lid for easy, spill-free portability.""
+
+            Now, transform this product description accordingly:
+
+            Vendor Description: {{$prompt}}
+            Enhanced Description:";
+
             """;
 
         ///// <summary>

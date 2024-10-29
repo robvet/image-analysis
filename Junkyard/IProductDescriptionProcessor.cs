@@ -1,4 +1,4 @@
-﻿namespace DescrptionEnhancementService
+﻿namespace DescrptionEnhancementService.DescrptionEnhancementServices.Contracts
 {
     public interface IProductDescriptionProcessor
     {

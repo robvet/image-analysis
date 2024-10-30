@@ -71,7 +71,7 @@ namespace DescrptionEnhancementService.DescrptionEnhancementServices.EnhanceDesc
 
                 var messages = new List<ChatMessage>();
                 messages.Add(new SystemChatMessage(PromptTemplates.SystemPromptTemplate));
-                messages.Add(new UserChatMessage(PromptTemplates.MainPromptTemplate.Replace("{{$prompt}}", "vendorDescription")));
+                messages.Add(new UserChatMessage(PromptTemplates.MainPromptTemplate.Replace("{{$prompt}}", vendorDescription)));
 
                 ChatCompletionOptions completionOptions = new ChatCompletionOptions
                 {

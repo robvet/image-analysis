@@ -29,6 +29,9 @@ builder.Services.AddSingleton(blobClient);
 builder.Services.AddScoped<IImageCaptionOrchestrator, ImageCaptionOrchestrator>();
 builder.Services.AddScoped<IFetchImage, FetchImage>();
 builder.Services.AddScoped<IInferCaption, InferCaption>();
+//builder.Services.AddScoped<InferCaption, IInferCaption>();
+
+
 //builder.Services.AddScoped<IInferCaption, InferCaptionRest>();
 
 builder.Services.AddScoped<IDescriptionOrchestrator, DescriptionOrchestrator>();

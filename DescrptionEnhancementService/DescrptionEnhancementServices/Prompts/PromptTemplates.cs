@@ -39,29 +39,36 @@ namespace DescrptionEnhancementService.DescrptionEnhancementServices.Prompts
             Follow these guidelines:
             
             1. Expand abbreviations and technical terms.
-            2. Clarify any details that might be unclear, ensuring the description is easy to understand.
-            3. Use simple, friendly language that highlights product features or benefits.
-
-            Examples:
-
-            Vendor Description: ""USB-C chgr, PD 30W, incl 3ft cable, compact.""
-            Enhanced Description: ""Compact USB-C charger with 30W Power Delivery for fast and efficient charging. Includes a 3-foot cable, making it ideal for charging devices on the go.""
-
-            Vendor Description: ""AAA batt, 1200 mAh, long-life, 1.5V.""
-            Enhanced Description: ""Long-lasting AAA battery with a 1200mAh capacity, delivering 1.5 volts of power—perfect for powering remote controls, toys, and other small devices.""
-
-            Vendor Description: ""LED bulb, 800 lm, dimmable, 10W, soft white.""
-            Enhanced Description: ""Energy-efficient LED bulb with 800 lumens of brightness. Dimmable with 10 watts of power, providing a soft white light that's perfect for cozy, ambient lighting.""
-
-            Vendor Description: ""SS water btl, dbl wall, BPA-free, 20oz, leak-proof lid.""
-            Enhanced Description: ""Durable stainless steel water bottle with double-wall insulation to keep drinks hot or cold. BPA-free, with a 20 oz capacity and a leak-proof lid for easy, spill-free portability.""
-
+            2. Clarify any details that might be unclear, while standardizing the description that customers can understand.
+            3. Keep max length of response to no more than 80 characters.
+            4. The description order should be standard description and quantity.  
+            
             Now, transform this product description accordingly:
 
             Vendor Description: {{$prompt}}
             Enhanced Description:";
 
             """;
+
+
+        //Examples:
+
+        //Vendor Description: ""USB-C chgr, PD 30W, incl 3ft cable, compact.""
+        //Enhanced Description: ""Compact USB-C charger with 30W Power Delivery for fast and efficient charging. Includes a 3-foot cable, making it ideal for charging devices on the go.""
+
+        //Vendor Description: ""AAA batt, 1200 mAh, long-life, 1.5V.""
+        //Enhanced Description: ""Long-lasting AAA battery with a 1200mAh capacity, delivering 1.5 volts of power—perfect for powering remote controls, toys, and other small devices.""
+
+        //Vendor Description: ""LED bulb, 800 lm, dimmable, 10W, soft white.""
+        //Enhanced Description: ""Energy-efficient LED bulb with 800 lumens of brightness. Dimmable with 10 watts of power, providing a soft white light that's perfect for cozy, ambient lighting.""
+
+        //Vendor Description: ""SS water btl, dbl wall, BPA-free, 20oz, leak-proof lid.""
+        //Enhanced Description: ""Durable stainless steel water bottle with double-wall insulation to keep drinks hot or cold. BPA-free, with a 20 oz capacity and a leak-proof lid for easy, spill-free portability.""
+
+
+
+
+
 
         ///// <summary>
         ///// Prompt template for for extracting keyword search from user question to be used 

@@ -10,6 +10,8 @@ using System.Text;
 using Newtonsoft.Json;
 using ValidateImageCaptionAPI.Models;
 using Newtonsoft.Json.Linq;
+using System;
+using ImageCaptionService.ImageCaptionServices.Prompts;
 
 namespace ImageCaptionService.ImageCaptionServices.InferCaption
 {
@@ -28,7 +30,7 @@ namespace ImageCaptionService.ImageCaptionServices.InferCaption
         private readonly int _maxOutputTokens = 2048;
 
         public InferCaption(IConfiguration configuration,
-                                   ILogger<InferCaption> logger)
+                            ILogger<InferCaption> logger)
         {
             _logger = logger;
 
@@ -68,7 +70,11 @@ namespace ImageCaptionService.ImageCaptionServices.InferCaption
             try
             {
                 var encodedImage = Convert.ToBase64String(imageBytes);
-                var serviceAddress = $"{_endpoint}openai/deployments/{_visionDeploymentModelName}/chat/completions?api-version=2024-08-01-preview";
+                //var serviceAddress = $"{_endpoint}openai/deployments/{_visionDeploymentModelName}/chat/completions?api-version=2024-08-01-preview";
+                var serviceAddress = $"{_endpoint}openai/deployments/{_deploymentOrModelName4}/chat/completions?api-version=2024-08-01-preview";
+
+                var system = PromptTemplates.SystemPromptTemplate;
+                var user = PromptTemplates.MainPromptTemplate;
 
                 using (var httpClient = new HttpClient())
                 {
@@ -76,33 +82,33 @@ namespace ImageCaptionService.ImageCaptionServices.InferCaption
                     var payload = new
                     {
                         messages = new object[]
-                        {
-                  new {
-                      role = "system",
-                      content = new object[] {
+                                {
                           new {
-                              type = "text",
-                              text = PromptTemplates.SystemPromptTemplate
-                              //text = "You are an assistant that identifies objects in images."
-                          }
-                      }
-                  },
-                  new {
-                      role = "user",
-                      content = new object[] {
-                          new {
-                              type = "image_url",
-                              image_url = new {
-                                  url = $"data:image/jpeg;base64,{encodedImage}"
+                              role = "system",
+                              content = new object[] {
+                                  new {
+                                      type = "text",
+                                      text = PromptTemplates.SystemPromptTemplate
+                                      //text = "You are an assistant that identifies objects in images."
+                                  }
                               }
                           },
                           new {
-                              type = "text",
-                              text = PromptTemplates.MainPromptTemplate
-                              //text = "Please identify the main object in the provided image."
+                              role = "user",
+                              content = new object[] {
+                                  new {
+                                      type = "image_url",
+                                      image_url = new {
+                                          url = $"data:image/jpeg;base64,{encodedImage}"
+                                      }
+                                  },
+                                  new {
+                                      type = "text",
+                                      text = PromptTemplates.MainPromptTemplate
+                                      //text = "Please identify the main object in the provided image."
+                                  }
+                              }
                           }
-                      }
-                  }
                         },
                         temperature = 0.1, // Keep the temperature low to get more accurate results
                         top_p = 0.8,
@@ -139,8 +145,6 @@ namespace ImageCaptionService.ImageCaptionServices.InferCaption
                         return inferenceResult;
 
                         //choices = choices.Trim();
-
-
 
                         //jsonResponse = responseData.Trim();
 
@@ -193,8 +197,6 @@ namespace ImageCaptionService.ImageCaptionServices.InferCaption
                 _logger.LogError(errorMessage);
                 throw;
             }
-
-            
         }
 
         public class OpenAIResponse

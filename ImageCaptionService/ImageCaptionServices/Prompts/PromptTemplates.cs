@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 using System.Runtime.ConstrainedExecution;
 
-namespace ImageCaptionService
+namespace ImageCaptionService.ImageCaptionServices.Prompts
 {
     internal static class PromptTemplates
     {
@@ -28,8 +28,29 @@ namespace ImageCaptionService
         //    You are an image recognition assistant. Your task is to examine images provided by the user and respond with only the label naming the main object in the picture. Additionally, include an estimated probability score for the inference. Return your response as a JSON object with fields object for the label and probability for the probability estimate. Avoid adding any descriptive details, explanations, or additional context. Respond concisely.
         //    """;
 
+        //public const string SystemPromptTemplate = """
+        //    You are an image recognition assistant. Your task is to examine images provided by the user and respond with a JSON object. The JSON object should contain two fields: object, which is the main object label you infer, and probability, which is your estimated confidence in that inference as a decimal between 0.0 and 1.0. Always provide both fields, and do not leave any fields blank. Avoid any additional context or description outside of the JSON format.
+        //    """;
+
+
         public const string SystemPromptTemplate = """
-            You are an image recognition assistant. Your task is to examine images provided by the user and respond with a JSON object. The JSON object should contain two fields: object, which is the main object label you infer, and probability, which is your estimated confidence in that inference as a decimal between 0.0 and 1.0. Always provide both fields, and do not leave any fields blank. Avoid any additional context or description outside of the JSON format.
+            You are an image recognition assistant. Your task is to examine images provided by the user and respond with a JSON object. 
+
+            The JSON representation should be in the following format:
+
+            {
+                "object": "banana",
+                "probability": 0.9,
+                "color": "yellow",
+                "count": 3,
+                "volume": null,
+                "isFood": true,
+                "isDrink": false,
+                "isAlcoholic": false,
+                "UPC": 12345,
+                "Manufacturer": "xyz company"
+            }
+            
             """;
 
 
@@ -46,23 +67,68 @@ namespace ImageCaptionService
         //    Please identify the main object in the provided image and include a probability estimate for your inference. Return only the JSON response, with fields object for the label and probability for your confidence estimate (a decimal between 0.0 and 1.0)
         //    """;
 
+        //public const string MainPromptTemplate = """
+        //    Please identify the main object in the provided image and include a probability estimate in JSON format, even if you’re uncertain. If uncertain, set probability to 0.5.
+
+        //    Return the analysis as an object named CaptionsCompletion in JSON format. Do not include the word JSON. 
+        //    Ensure the CaptionsCompletion object includes the object and probability percentage.
+
+        //    The JSON representation should be in the following format:
+
+        //    { "object": "banana", "probability": 0.9 }
+
+        //    Return only the CaptionsCompletion in a valid JSON format - nothing else.
+
+        //    Replace values as appropriate and ensure both fields are always populated.
+
+        //    DO NOT PUT ANY CHARACTERS OR STRINGS WHATSOEVER of ANY KIND BEFORE OR AFTER THE CaptionsCompletion object. This includes  ``` , ```, {, or } -- ABSOLUTELY NO CHARACTERS.
+        //    As well, DO NOT include the word JSON anywhere in the response.
+        //    """;
+
+
+
         public const string MainPromptTemplate = """
-            Please identify the main object in the provided image and include a probability estimate in JSON format, even if you’re uncertain. If uncertain, set probability to 0.5.
+            Please identify the main object in the provided image and include a probability estimate in JSON format, even if you’re uncertain. If uncertain, set probability to 0.0.
             
+            Infer the following information from the image:
+
+            1- The object that appears in the image.
+            2- The probability of your inference being correct(between 0.0 and 0.99).
+            3 - What product category would this image fall into?
+
+                Examples include:
+                a- Food
+                b- Beverage
+                c- Cigarette
+
+            4 - The color of the object.
+            5 - The number of objects in the image.
+            6 - The volume of the object.
+            7 - Whether the object is food.
+            8 - Whether the object is a drink.
+            9 - Whether the object is alcoholic.
+            10 - The widely-recognized UPC code of the object.
+            11 - The manufacturer of the object.
+
             Return the analysis as an object named CaptionsCompletion in JSON format. Do not include the word JSON. 
+        
             Ensure the CaptionsCompletion object includes the object and probability percentage.
-            
-            The JSON representation should be in the following format:
-
-            { "object": "banana", "probability": 0.9 }
-            
+                                    
             Return only the CaptionsCompletion in a valid JSON format - nothing else.
-
+            
             Replace values as appropriate and ensure both fields are always populated.
             
             DO NOT PUT ANY CHARACTERS OR STRINGS WHATSOEVER of ANY KIND BEFORE OR AFTER THE CaptionsCompletion object. This includes  ``` , ```, {, or } -- ABSOLUTELY NO CHARACTERS.
             As well, DO NOT include the word JSON anywhere in the response.
+                                    
             """;
+
+
+
+
+
+
+
 
         ///// <summary>
         ///// Prompt template for for extracting keyword search from user question to be used 

@@ -1,6 +1,4 @@
-﻿using ValidateImageCaptionAPI.Models;
-
-namespace DescrptionEnhancementService.DescrptionEnhancementServices.Contracts
+﻿namespace DescrptionEnhancementService.DescrptionEnhancementServices.Contracts
 {
     public interface IDescriptionOrchestrator
     {

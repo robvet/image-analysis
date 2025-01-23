@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace Shared.Models
+namespace ImageAnalysisServices.Models
 {
-    public class ImageCaptionResult
+    public class ImageAnalysisResult
+
     {
-        public ImageCaptionResult(string targetObject, double probability)
+        public ImageAnalysisResult(string targetObject, double probability)
         {
             TargetObject = targetObject;
             Probability = probability;

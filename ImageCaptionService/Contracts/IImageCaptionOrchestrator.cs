@@ -1,4 +1,4 @@
-﻿using ValidateImageCaptionAPI.Models;
+﻿using Shared.Models;
 
 namespace ImageCaptionService.Contracts
 {

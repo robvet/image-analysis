@@ -1,6 +1,6 @@
 ﻿using Shared.Models;
 
-namespace ImageCaptionService.Contracts
+namespace Shared.Contracts
 {
     public interface IInferCaption
     {

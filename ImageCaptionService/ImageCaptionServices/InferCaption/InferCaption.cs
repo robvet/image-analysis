@@ -8,10 +8,10 @@ using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
-using ValidateImageCaptionAPI.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using ImageCaptionService.ImageCaptionServices.Prompts;
+using Shared.Models;
 
 namespace ImageCaptionService.ImageCaptionServices.InferCaption
 {
@@ -65,71 +65,95 @@ namespace ImageCaptionService.ImageCaptionServices.InferCaption
                 ?? throw new ArgumentException("ai-maxoutputtokens is Missing"));
         }
 
+        // This method is responsible for inferring the caption of an image by sending it to an AI service.
         public async Task<ImageCaptionResult> InferImageCaptionAsync(byte[] imageBytes)
         {
             try
             {
+                // Convert the image bytes to a Base64 string.
                 var encodedImage = Convert.ToBase64String(imageBytes);
-                //var serviceAddress = $"{_endpoint}openai/deployments/{_visionDeploymentModelName}/chat/completions?api-version=2024-08-01-preview";
+
+                // Construct the service address for the AI model endpoint.
                 var serviceAddress = $"{_endpoint}openai/deployments/{_deploymentOrModelName4}/chat/completions?api-version=2024-08-01-preview";
 
+                // Retrieve the system and user prompt templates.
                 var system = PromptTemplates.SystemPromptTemplate;
                 var user = PromptTemplates.MainPromptTemplate;
 
+                // Create an HttpClient instance to send the request.
                 using (var httpClient = new HttpClient())
                 {
+                    // Add the API key to the request headers.
                     httpClient.DefaultRequestHeaders.Add("api-key", _key);
+
+                    // Construct the payload for the request.
                     var payload = new
                     {
+                        // The messages array contains the conversation history.
+                        // The first message is from the system, setting the context for the AI.
                         messages = new object[]
-                                {
-                          new {
-                              role = "system",
-                              content = new object[] {
-                                  new {
-                                      type = "text",
-                                      text = PromptTemplates.SystemPromptTemplate
-                                      //text = "You are an assistant that identifies objects in images."
-                                  }
-                              }
-                          },
-                          new {
-                              role = "user",
-                              content = new object[] {
-                                  new {
-                                      type = "image_url",
-                                      image_url = new {
-                                          url = $"data:image/jpeg;base64,{encodedImage}"
-                                      }
-                                  },
-                                  new {
-                                      type = "text",
-                                      text = PromptTemplates.MainPromptTemplate
-                                      //text = "Please identify the main object in the provided image."
-                                  }
-                              }
-                          }
+                        {
+                            new {
+                                role = "system",
+                                content = new object[] {
+                                    new {
+                                        // The type of content is text.
+                                        type = "text",
+                                        // The actual text content is retrieved from the system prompt template.
+                                        text = PromptTemplates.SystemPromptTemplate
+                                    }
+                                }
+                            },
+                            // The second message is from the user, containing the image and the user prompt.
+                            new {
+                                role = "user",
+                                content = new object[] {
+                                    new {
+                                        // The type of content is an image URL.
+                                        type = "image_url",
+                                        // The image URL is constructed using the base64 encoded image.
+                                        image_url = new {
+                                            url = $"data:image/jpeg;base64,{encodedImage}"
+                                        }
+                                    },
+                                    new {
+                                        // The type of content is text.
+                                        type = "text",
+                                        // The actual text content is retrieved from the main prompt template.
+                                        text = PromptTemplates.MainPromptTemplate
+                                    }
+                                }
+                            }
                         },
-                        temperature = 0.1, // Keep the temperature low to get more accurate results
+                        // Set the temperature for the AI model to control randomness.
+                        temperature = 0.1,
+                        // Set the nucleus sampling parameter.
                         top_p = 0.8,
-                        max_tokens = 4096, //_maxTokens,
+                        // Set the maximum number of tokens for the response.
+                        max_tokens = 4096,
+                        // Disable streaming responses.
                         stream = false
-                        //response_format = new { type = "json_object" }
                     };
 
+                    // Send the POST request to the AI service.
                     var response = await httpClient.PostAsync(serviceAddress, new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json"));
 
+                    // Check if the response is successful.
                     if (response.IsSuccessStatusCode)
                     {
+                        // Deserialize the response content.
                         var responseData = JsonConvert.DeserializeObject<OpenAIResponse>(await response.Content.ReadAsStringAsync());
 
+                        // Check if there are any choices in the response.
                         if (responseData.Choices.Count == 0)
                         {
                             return new ImageCaptionResult(string.Empty, 0.0);
                         }
 
+                        // Extract the content of the first choice.
                         var choices = responseData.Choices[0].Message.Content;
 
+                        // Extract the JSON object from the response content.
                         int startIndex = choices.IndexOf('{');
                         int endIndex = choices.LastIndexOf('}');
                         if (startIndex != -1 && endIndex != -1 && endIndex > startIndex)
@@ -137,9 +161,11 @@ namespace ImageCaptionService.ImageCaptionServices.InferCaption
                             choices = choices.Substring(startIndex, endIndex - startIndex + 1);
                         }
 
+                        // Parse the JSON object and cleanse it.
                         var jsonObject = JObject.Parse(choices);
                         var cleansedJson = JsonConvert.SerializeObject(jsonObject, Formatting.Indented);
 
+                        // Deserialize the cleansed JSON into an ImageCaptionResult object.
                         ImageCaptionResult inferenceResult = JsonConvert.DeserializeObject<ImageCaptionResult>(cleansedJson);
 
                         return inferenceResult;

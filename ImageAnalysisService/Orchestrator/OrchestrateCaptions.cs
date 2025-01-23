@@ -1,30 +1,31 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using ImageCaptionService.Contracts;
-using Shared.Models;
+using ImageAnalysisServices.Models;
+using ImageAnalysisServices.Contracts;
 
 
-namespace ImageCaptionService.ImageCaptionServices.Orchestrator
+namespace ImageAnalysisServices.Orchestrator
 {
-    public class ImageCaptionOrchestrator : IImageCaptionOrchestrator
+    public class ImageAnalysisOrchestrator : Contracts.IImageAnalysisOrchestrator
     {
-        private readonly ILogger<ImageCaptionOrchestrator> _logger;
+        private readonly ILogger<ImageAnalysisOrchestrator> _logger;
         private readonly IConfiguration _configuration;
         private readonly IFetchImage _fetchImage;
-        private readonly IInferCaption _inferCaption;
+        private readonly IImageAnalysisService _analysisService;
 
-        public ImageCaptionOrchestrator(ILogger<ImageCaptionOrchestrator> logger,
+        public ImageAnalysisOrchestrator(ILogger<ImageAnalysisOrchestrator> logger,
                                         IConfiguration configuration,
                                         IFetchImage fetchImage,
-                                        IInferCaption inferCaption)
+                                        IImageAnalysisService analysisService)
         {
             _logger = logger;
             _configuration = configuration;
             _fetchImage = fetchImage;
-            _inferCaption = inferCaption;
+            _analysisService = analysisService;
         }
 
-        public async Task<ImageCaptionResult> OrchestrateAsync(string imageName)
+        public async Task<ImageAnalysisResult> OrchestrateAsync(string imageName)
         {
             try
             {
@@ -33,17 +34,17 @@ namespace ImageCaptionService.ImageCaptionServices.Orchestrator
 
                 if (imageBytes == null)
                 {
-                    return new ImageCaptionResult("Not Found", 0);
+                    return new ImageAnalysisResult("Not Found", 0);
                 }
 
-                var imageCaption = await _inferCaption.InferImageCaptionAsync(imageBytes);
+                var imageAnalysis = await _analysisService.AnalyzeImage(imageName);
 
-                if (imageCaption == null)
+                if (imageAnalysis == null)
                 {
-                    return new ImageCaptionResult("Not Found", 0);
+                    return new ImageAnalysisResult("Not Found", 0);
                 }
 
-                return imageCaption;
+                return imageAnalysis;
             }
             catch (Exception ex)
             {
